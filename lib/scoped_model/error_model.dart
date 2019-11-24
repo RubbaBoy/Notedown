@@ -5,5 +5,5 @@ import 'package:notedown/services/storage_service.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ErrorModel extends BaseModel {
-  StorageService storageService = locator<StorageService>();
+  RequestService storageService = locator<RequestService>();
 }

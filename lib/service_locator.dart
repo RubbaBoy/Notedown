@@ -8,7 +8,7 @@ GetIt locator = GetIt();
 
 void setupLocator() {
   // Register services
-  locator.registerLazySingleton<StorageService>(() => StorageService());
+  locator.registerLazySingleton<RequestService>(() => RequestService());
 
   // Register models
   locator.registerFactory<HomeModel>(() => HomeModel());

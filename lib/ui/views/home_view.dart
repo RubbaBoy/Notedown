@@ -12,6 +12,8 @@ import 'package:notedown/ui/widgets/busy_overlay.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+final double childrenMargin = 5;
+
 class HomeView extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<NoteWrapState> _noteWrapKey = GlobalKey<NoteWrapState>();
@@ -19,8 +21,8 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseView<HomeModel>(
-        builder: (context, child, model) =>
-            BusyOverlay(
+        onModelReady: (model) => model.getNotes(),
+        builder: (context, child, model) => BusyOverlay(
               show: model.state == ViewState.Busy,
               child: Scaffold(
                 key: _scaffoldKey,
@@ -43,19 +45,22 @@ class HomeView extends StatelessWidget {
                         accountEmail: Text('adam@yarr.is'),
                         currentAccountPicture: Container(
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(
-                                    'https://rubbaboy.me/images/5hy10o9.png'),
-                              ),
-                            )),
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(
+                                'https://rubbaboy.me/images/5hy10o9.png'),
+                          ),
+                        )),
                       ),
-                      drawerItem(context, Icons.lightbulb_outline, 'All', () {}),
+                      drawerItem(context, Icons.home, 'All', () {},
+                          selected: true),
                       drawerSectionTitle(context, 'Categories'),
-                      drawerItem(context, Icons.label_outline, 'Wish List', () {}),
+                      drawerItem(
+                          context, Icons.label_outline, 'Wish List', () {}),
                       drawerItem(context, Icons.label_outline, 'Ideas', () {}),
-                      drawerItem(context, Icons.label_outline, 'Other Shit', () {}),
+                      drawerItem(
+                          context, Icons.label_outline, 'Other Shit', () {}),
                       drawerSeparator(),
                       drawerItem(context, Icons.delete, 'Trash', () {}),
                       drawerSeparator(),
@@ -69,9 +74,7 @@ class HomeView extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
                         child: Container(
-                          color: Theme
-                              .of(context)
-                              .cardColor,
+                          color: Theme.of(context).cardColor,
                           padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
                           child: Row(
                             children: [
@@ -102,20 +105,10 @@ class HomeView extends StatelessWidget {
                         ),
                       ),
                       NoteWrap(
-                        key: _noteWrapKey,
-                        children: [
-                          display(),
-                          display(),
-                          display(),
-                          display(),
-                          display(),
-                          display(),
-                          display(),
-                          display(),
-                          display(),
-                          display()
-                        ],
-                      ),
+                          key: _noteWrapKey,
+                          children: model.notes
+                              .map((data) => NoteDisplay(text: data.data))
+                              .toList()),
                     ],
                   ),
                 ),
@@ -123,56 +116,53 @@ class HomeView extends StatelessWidget {
             ));
   }
 
-  Divider drawerSeparator() {
-    return Divider();
-  }
+  Divider drawerSeparator() => Divider();
 
-  ListTile drawerSectionTitle(BuildContext context, String name) {
-    return ListTile(
-      isThreeLine: false,
-      dense: true,
-      title: Text(
+  ListTile drawerSectionTitle(BuildContext context, String name) => ListTile(
+        isThreeLine: false,
+        dense: true,
+        title: Text(
           name,
-        style: Theme.of(context).textTheme.subtitle,
-      ),
-    );
-  }
+          style: Theme.of(context).textTheme.subtitle,
+        ),
+      );
 
-  ListTile drawerItem(BuildContext context, IconData icon, String name, Function() onTap) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(name),
-      onTap: () {
-        Navigator.pop(context);
-        onTap();
-      }
-    );
-  }
+  ListTile drawerItem(
+          BuildContext context, IconData icon, String name, Function() onTap,
+          {bool selected = false}) =>
+      ListTile(
+          leading: Icon(icon),
+          title: Text(name),
+          selected: selected,
+          onTap: () {
+            Navigator.pop(context);
+            onTap();
+          });
 
-  NoteDisplay display() => NoteDisplay(_noteWrapKey);
+  NoteDisplay display() => NoteDisplay();
 }
 
 class NoteDisplay extends StatefulWidget {
-  final GlobalKey<NoteWrapState> _noteWrapKey;
+  final String text;
 
-  NoteDisplay(this._noteWrapKey);
+  NoteDisplay({this.text});
 
   @override
-  State<StatefulWidget> createState() => NoteState(_noteWrapKey);
+  State<StatefulWidget> createState() => NoteState(text: text);
 }
 
 class NoteState extends State<NoteDisplay> {
-  final GlobalKey<NoteWrapState> _noteWrapKey;
+  final String text;
 
-  NoteState(this._noteWrapKey);
+  NoteState({this.text});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-        margin: EdgeInsets.all(_noteWrapKey.currentState.childrenMargin),
+        margin: EdgeInsets.all(childrenMargin),
         child: Container(
-            height: (Random.secure().nextDouble() * 200 + 50) as double,
-            child: Text('Text from some random ass note that is right here.')));
+            height: (Random.secure().nextDouble() * 200 + 50),
+            child: Text(text)));
   }
 }
 
@@ -187,18 +177,18 @@ class NoteWrap extends StatefulWidget {
 
 class NoteWrapState extends State<NoteWrap> {
   final List<NoteDisplay> children;
-  double childrenWidth = 1;
-  double childrenMargin = 5;
 
   NoteWrapState({this.children});
 
   @override
   Widget build(BuildContext context) {
+    print('Children size: ${children.length}');
     return Container(
       child: Expanded(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: CustomScrollView(
+            physics: null,
             slivers: [
               SliverStaggeredGrid.countBuilder(
                 crossAxisCount: 2,
