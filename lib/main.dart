@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notedown/ui/views/home_view.dart';
+import 'package:notedown/scoped_model/note_list_model.dart';
+import 'package:notedown/ui/views/note_list_view.dart';
 
 import 'service_locator.dart';
 
@@ -13,10 +14,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Notedown',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
-      home: HomeView(),
+      home: NoteListView(category: NoteCategory.all),
     );
   }
 }
