@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:notedown/enums/view_states.dart';
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/service_locator.dart';
-import 'package:notedown/services/storage_service.dart';
+import 'package:notedown/services/request_service.dart';
 import 'package:notedown/ui/views/note_list_view.dart';
-import 'package:uuid/uuid.dart';
 
 class NoteListModel extends BaseModel {
   RequestService _requestService = locator<RequestService>();
@@ -20,18 +18,11 @@ class NoteListModel extends BaseModel {
 
     // TODO: Make #getCachedNotes() request category-specific notes
     var cached = await _requestService.getCachedNotes(category);
-    category.notes = cached.map((data) => NoteDisplay(title: data.title, preview: data.preview))
+    category.notes = cached.map((data) => NoteDisplay(note: data))
         .toList();
 
     setState(ViewState.Retrieved);
   }
-}
-
-class NoteData {
-  String title;
-  String preview;
-
-  NoteData({this.title, this.preview});
 }
 
 enum CategoryType {

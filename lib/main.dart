@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/ui/views/login_view.dart';
@@ -17,7 +15,6 @@ class MyApp extends StatelessWidget {
       title: 'Notedown',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
-//      home: NoteListView(category: NoteCategory.all),
       home: LoginView(),
     );
   }

@@ -7,6 +7,8 @@ class FunctionsService {
       CloudFunctions.instance.getHttpsCallable(functionName: 'getCategories');
   final HttpsCallable _editNoteCallable =
       CloudFunctions.instance.getHttpsCallable(functionName: 'editNote');
+  final HttpsCallable _getNotesCallable =
+      CloudFunctions.instance.getHttpsCallable(functionName: 'getNotes');
 
   /// Returns the created category ID.
   Future<String> addCategory(String name) async {
@@ -30,17 +32,25 @@ class FunctionsService {
         throw FailedFunctionException('getCategories', data['error']);
       }
 
-      return data['categories'].map<FetchedCategory>((category) => FetchedCategory(category['id'], category['name'])).toList();
+      return data['categories']
+          .map<FetchedCategory>(
+              (category) => FetchedCategory(category['id'], category['name']))
+          .toList();
     } on CloudFunctionsException catch (e) {
       throw FailedFunctionException('getCategories', e.message);
     }
   }
 
   /// Edits or creates the note by ID. Returns the note's ID.
-  Future<String> editNote({String id, String category, String title, String content}) async {
+  Future<String> editNote(
+      {String id, String categoryId, String title, String content}) async {
     try {
-      var data = (await _editNoteCallable
-              .call({'id': id, 'category': category, 'title': title, 'content': content}))
+      var data = (await _editNoteCallable.call({
+        'id': id,
+        'category': categoryId,
+        'title': title,
+        'content': content
+      }))
           .data;
       if (!data['success']) {
         throw FailedFunctionException('editNote', data['error']);
@@ -51,6 +61,24 @@ class FunctionsService {
       throw FailedFunctionException('editNote', e.message);
     }
   }
+
+  Future<List<FetchedNote>> getNotes([String categoryId]) async {
+    try {
+      var data = (await _getNotesCallable.call({'category': categoryId})).data;
+      if (!data['success']) {
+        throw FailedFunctionException('getNotes', data['error']);
+      }
+
+      print('Notes:\n$data');
+
+      return data['notes']
+          .map<FetchedNote>((category) => FetchedNote(category['id'],
+              category['category'], category['title'], category['content']))
+          .toList();
+    } on CloudFunctionsException catch (e) {
+      throw FailedFunctionException('getNotes', e.message);
+    }
+  }
 }
 
 class FetchedCategory {
@@ -58,6 +86,15 @@ class FetchedCategory {
   String name;
 
   FetchedCategory(this.id, this.name);
+}
+
+class FetchedNote {
+  String id;
+  String category;
+  String title;
+  String content;
+
+  FetchedNote(this.id, this.category, this.title, this.content);
 }
 
 class FailedFunctionException implements Exception {

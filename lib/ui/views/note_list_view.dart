@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notedown/scoped_model/note_list_model.dart';
+import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/ui/views/base_view.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 
@@ -63,21 +63,20 @@ class NoteListView extends StatelessWidget {
 }
 
 class NoteDisplay extends StatefulWidget {
-  final String title;
-  final String preview;
+  final FetchedNote note;
 
-  NoteDisplay({this.title, this.preview});
+  NoteDisplay({this.note});
 
   @override
-  State<StatefulWidget> createState() =>
-      NoteState(title: title, preview: preview);
+  State<StatefulWidget> createState() => NoteState(note: note);
 }
 
 class NoteState extends State<NoteDisplay> {
-  final String title;
+  final FetchedNote note;
   final String preview;
 
-  NoteState({this.title, this.preview});
+  NoteState({this.note})
+      : preview = note.content.substring(0, min(note.content.length, 200));
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +92,7 @@ class NoteState extends State<NoteDisplay> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
               child: Text(
-                title,
+                note.title,
                 style: titleTheme,
               ),
             ),

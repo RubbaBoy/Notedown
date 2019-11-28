@@ -78,7 +78,7 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
       widget.onModelReady(_model);
     }
 
-    _model.navigationService.getCachedCategories();
+//    _model.navigationService.getCachedCategories();
 
     super.initState();
   }
