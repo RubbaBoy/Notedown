@@ -16,6 +16,9 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.2.2 <3.0.0"
 
+module:
+  androidX: true
+
 dependencies:
   flutter:
     sdk: flutter
@@ -27,6 +30,10 @@ dependencies:
   outline_material_icons: ^0.1.1
   flutter_staggered_grid_view: ^0.3.0
   pull_to_refresh: ^1.5.7
+  uuid: ^2.0.4
+  firebase_auth: ^0.15.0+1
+  google_sign_in: ^4.0.14
+  cloud_functions: ^0.4.1+4
 
 dev_dependencies:
   flutter_test:

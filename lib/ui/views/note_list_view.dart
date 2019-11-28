@@ -63,26 +63,48 @@ class NoteListView extends StatelessWidget {
 }
 
 class NoteDisplay extends StatefulWidget {
-  final String text;
+  final String title;
+  final String preview;
 
-  NoteDisplay({this.text});
+  NoteDisplay({this.title, this.preview});
 
   @override
-  State<StatefulWidget> createState() => NoteState(text: text);
+  State<StatefulWidget> createState() =>
+      NoteState(title: title, preview: preview);
 }
 
 class NoteState extends State<NoteDisplay> {
-  final String text;
+  final String title;
+  final String preview;
 
-  NoteState({this.text});
+  NoteState({this.title, this.preview});
 
   @override
   Widget build(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
+    var titleTheme = textTheme.subhead.copyWith(fontWeight: FontWeight.bold);
     return Card(
-        margin: EdgeInsets.all(childrenMargin),
-        child: Container(
-            height: (Random.secure().nextDouble() * 200 + 50),
-            child: Text(text)));
+      margin: EdgeInsets.all(childrenMargin),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+              child: Text(
+                title,
+                style: titleTheme,
+              ),
+            ),
+            Text(
+              preview,
+              style: Theme.of(context).textTheme.body1,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

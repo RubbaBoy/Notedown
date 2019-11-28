@@ -4,6 +4,7 @@ import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/storage_service.dart';
 import 'package:notedown/ui/views/note_list_view.dart';
+import 'package:uuid/uuid.dart';
 
 class NoteListModel extends BaseModel {
   RequestService _requestService = locator<RequestService>();
@@ -19,10 +20,8 @@ class NoteListModel extends BaseModel {
 
     // TODO: Make #getCachedNotes() request category-specific notes
     var cached = await _requestService.getCachedNotes(category);
-    category.notes = cached.map((data) => NoteDisplay(text: data.data))
+    category.notes = cached.map((data) => NoteDisplay(title: data.title, preview: data.preview))
         .toList();
-
-    print('DONE loading notes for ${category.name} Notes: ${category.notes}');
 
     setState(ViewState.Retrieved);
   }
@@ -30,9 +29,9 @@ class NoteListModel extends BaseModel {
 
 class NoteData {
   String title;
-  String data;
+  String preview;
 
-  NoteData({this.title, this.data});
+  NoteData({this.title, this.preview});
 }
 
 enum CategoryType {
@@ -40,23 +39,25 @@ enum CategoryType {
 }
 
 class NoteCategory {
-  static NoteCategory all = NoteCategory(id: 0, name: 'All', type: CategoryType.All);
+  static const String allUuid = 'b70b1f26-f2a9-4553-8271-81442538520d';
+  static NoteCategory all = NoteCategory(uuid: allUuid, index: 0, name: 'All', type: CategoryType.All);
 
   List<NoteDisplay> notes = [];
-  int id;
+  String uuid;
   String name;
+  int index;
   CategoryType type;
 
-  NoteCategory({this.id, this.name, this.type = CategoryType.Named}) : assert(!(id == 0 && type != CategoryType.All), 'ID is 0 and category type is all');
+  NoteCategory({this.uuid, this.index, this.name, this.type = CategoryType.Named}) : assert(!(uuid == allUuid && type != CategoryType.All), 'ID is 0 and category type is all');
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
           other is NoteCategory &&
               runtimeType == other.runtimeType &&
-              id == other.id;
+              uuid == other.uuid;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => uuid.hashCode;
 
 }

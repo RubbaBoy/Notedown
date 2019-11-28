@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:notedown/scoped_model/note_list_model.dart';
-import 'package:notedown/ui/views/note_list_view.dart';
+import 'dart:async';
 
-import 'service_locator.dart';
+import 'package:flutter/material.dart';
+import 'package:notedown/service_locator.dart';
+import 'package:notedown/ui/views/login_view.dart';
 
 void main() {
   setupLocator();
@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
       title: 'Notedown',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
-      home: NoteListView(category: NoteCategory.all),
+//      home: NoteListView(category: NoteCategory.all),
+      home: LoginView(),
     );
   }
 }

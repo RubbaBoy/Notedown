@@ -101,7 +101,7 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
                   ? Icons.label_outline
                   : Icons.home,
               category.name,
-              id: category.id,
+              id: category.index,
               builder: (context) => NoteListView(category: category)))
           ?.toList() ??
       [];
