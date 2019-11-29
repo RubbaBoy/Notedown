@@ -13,23 +13,24 @@ class NoteEditView extends StatefulWidget {
 }
 
 class NoteEditViewState extends State<NoteEditView> {
-  TextEditingController controller;
+  TextEditingController titleController;
+  TextEditingController contentController;
   FetchedNote note;
 
   NoteEditViewState(this.note);
 
   @override
   Widget build(BuildContext context) {
-    print(Theme.of(context).textTheme.body1.fontSize);
     return BaseView<NoteEditModel>(
       showFab: false,
       onModelReady: (model) {
-        controller = TextEditingController(text: note.title);
-        model.reset(context, controller, note);
+        titleController = TextEditingController(text: note.title);
+        contentController = TextEditingController(text: note.content);
+        model.reset(context, titleController, contentController, note);
       },
       onModelEnd: (model) => model.dispose(),
       builder: (context, child, model) => Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -37,8 +38,7 @@ class NoteEditViewState extends State<NoteEditView> {
               IconButton(
                 padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
                 icon: Icon(Icons.arrow_back),
-//                  onPressed: () => Navigator.pop(context),
-                onPressed: () => print('Pressed!'),
+                  onPressed: () => Navigator.pop(context),
               ),
               Expanded(
                 child: GestureDetector(
@@ -52,7 +52,7 @@ class NoteEditViewState extends State<NoteEditView> {
                       : TextField(
                           autofocus: true,
                           onSubmitted: model.submitTitle,
-                          controller: controller,
+                          controller: titleController,
                           focusNode: model.titleFocusNode,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.headline,
@@ -71,7 +71,7 @@ class NoteEditViewState extends State<NoteEditView> {
           Divider(height: 8),
           SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               getFormatButton(
                 icon: Icons.format_bold,
@@ -102,18 +102,19 @@ class NoteEditViewState extends State<NoteEditView> {
           Divider(),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: TextField(
-                  maxLines: null,
-                  expands: false,
-                  maxLengthEnforced: false,
-                  enableInteractiveSelection: true,
-                  focusNode: model.bodyFocusNode,
-                  style: Theme.of(context).textTheme.body1.copyWith(fontSize: 16),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                  ),
+                maxLines: null,
+                expands: true,
+                maxLengthEnforced: false,
+                enableInteractiveSelection: true,
+                controller: contentController,
+                focusNode: model.bodyFocusNode,
+                style: Theme.of(context).textTheme.body1.copyWith(fontSize: 16),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
                 ),
+              ),
             ),
           ),
         ],
@@ -123,7 +124,7 @@ class NoteEditViewState extends State<NoteEditView> {
 
   Widget getFormatButton({@required IconData icon, Function() onPressed}) =>
       getButton(
-          icon: icon, size: 30, vpadding: 0, hpadding: 8, onPressed: onPressed);
+          icon: icon, size: 30, vpadding: 0, hpadding: 0, onPressed: onPressed);
 
   Widget getButton(
           {@required IconData icon,

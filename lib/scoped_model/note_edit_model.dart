@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:notedown/scoped_model/base_model.dart';
+import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
 
 class NoteEditModel extends BaseModel {
+  FunctionsService functionsService = locator<FunctionsService>();
   KeyboardVisibilityNotification keyboardVisibilityNotification = KeyboardVisibilityNotification();
   FocusNode titleFocusNode = FocusNode();
   FocusNode bodyFocusNode = FocusNode();
   bool editingTitle = false;
   TextEditingController _titleController;
+  TextEditingController _contentController;
 
   FetchedNote _note;
 
-  String get title => _note.title;
-  String get content => _note.content;
-
-  NoteEditModel() {
-    print('New NoteEditModel!!!!!!!!!!!!!!');
-  }
+  String title;
 
   void tapTitle(BuildContext context) {
     editingTitle = true;
@@ -26,10 +24,11 @@ class NoteEditModel extends BaseModel {
     Future.delayed(Duration(milliseconds: 100), () => FocusScope.of(context).requestFocus(titleFocusNode));
   }
 
-  void reset(BuildContext context, TextEditingController titleController, FetchedNote note) {
+  void reset(BuildContext context, TextEditingController titleController, TextEditingController contentController, FetchedNote note) {
     _titleController = titleController;
+    _contentController = contentController;
     _note = note;
-    editingTitle = false;
+    title = _note.title;
 
     keyboardVisibilityNotification.addNewListener(
       onChange: (visible) {
@@ -46,11 +45,27 @@ class NoteEditModel extends BaseModel {
 
   void dispose() {
     keyboardVisibilityNotification.dispose();
+    save();
+  }
+
+  void save() {
+    var oldContent = _note.content?.trim();
+    var newContent = _contentController.text.trim();
+
+    var oldTitle = _note.title?.trim();
+    var newTitle = title.trim();
+
+    if (oldContent != newContent || oldTitle != newTitle) {
+      print('Saving...');
+
+      _note.content = newContent;
+      _note.title = newTitle;
+      functionsService.editNote(id: _note.id, title: newTitle, content: newContent);
+    }
   }
 
   void submitTitle(String title) {
-    print('Submitted "$title"');
-    _note.title = title;
+    this.title = title;
     editingTitle = false;
     notifyListeners();
   }

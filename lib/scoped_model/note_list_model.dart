@@ -5,6 +5,7 @@ import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/services/request_service.dart';
+import 'package:notedown/ui/views/note_edit_view.dart';
 import 'package:notedown/ui/views/note_list_view.dart';
 
 class NoteListModel extends BaseModel {
@@ -20,11 +21,11 @@ class NoteListModel extends BaseModel {
     setState(ViewState.Busy);
 
     // TODO: Make #getCachedNotes() request category-specific notes
-    var cached = await _requestService.getCachedNotes(category);
-    category.notes =
-        cached.map((data) => NoteDisplay(note: data, model: this)).toList();
-
-    setState(ViewState.Retrieved);
+    _requestService.getCachedNotes(category).then((cached) {
+      category.notes =
+          cached.map((data) => NoteDisplay(note: data, model: this)).toList();
+      setState(ViewState.Retrieved);
+    });
   }
 
   void openNote(BuildContext context, FetchedNote note) {
@@ -33,7 +34,7 @@ class NoteListModel extends BaseModel {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => NoteListView(NoteCategory.all)));
+            builder: (context) => NoteEditView(note)));
     setState(ViewState.Retrieved);
   }
 }

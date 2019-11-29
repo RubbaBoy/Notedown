@@ -73,7 +73,7 @@ class FunctionsService {
 
       return data['notes']
           .map<FetchedNote>((category) => FetchedNote(category['id'],
-              category['category'], category['title'], category['content']))
+              category['categoryId'] ?? '', category['title'] ?? '', category['content'] ?? ''))
           .toList();
     } on CloudFunctionsException catch (e) {
       throw FailedFunctionException('getNotes', e.message);

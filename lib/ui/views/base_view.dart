@@ -19,7 +19,7 @@ class BaseView<T extends BaseModel> extends StatefulWidget {
       ScopedModelDescendantBuilder<T> builder,
       this.onModelReady,
       this.onModelEnd,
-      this.showFab})
+      this.showFab = true})
       : _scaffoldKey = scaffoldKey,
         _builder = builder;
 
@@ -36,6 +36,7 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
     otherBuilder = (context, child, BaseModel model) => BusyOverlay(
           show: model.state == ViewState.Busy,
           child: Scaffold(
+            resizeToAvoidBottomInset: true,
             key: widget._scaffoldKey,
             floatingActionButton: (!widget.showFab
                 ? null

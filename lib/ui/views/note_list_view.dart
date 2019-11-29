@@ -26,7 +26,7 @@ class NoteListViewState extends State<NoteListView> {
   Widget build(BuildContext context) {
     return BaseView<NoteListModel>(
       scaffoldKey: _scaffoldKey,
-      onModelReady: (model) async => await model.refreshNotes(category),
+      onModelReady: (model) => model.refreshNotes(category),
       builder: (context, child, model) => ListView(
         shrinkWrap: true,
         children: [

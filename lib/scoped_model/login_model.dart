@@ -18,7 +18,6 @@ class LoginModel extends BaseModel {
     setState(ViewState.Busy);
 
     navigationService.getCachedCategories().then((_) {
-      Navigator.pop(context);
       Navigator.push(
         context, MaterialPageRoute(builder: (context) => NoteListView(NoteCategory.all)));
       setState(ViewState.Retrieved);

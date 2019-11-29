@@ -20,7 +20,7 @@ class LoginView extends StatelessWidget {
               SizedBox(height: 50),
               RaisedButton(
                 child: Text('Log in'),
-                onPressed: () async => await model.onPress(context),
+                onPressed: () => model.onPress(context),
               ),
             ],
           ),
