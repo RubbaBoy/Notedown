@@ -1,9 +1,11 @@
 # Notedown
 
-Notedown is a Markdown note taking app. It is a Flutter app that is meant to be used on mobile devices, the web, and desktop. It will be using Firebase for authentication and potentially other things, and a MySQL (Or possibly a NoSQL) database for storing the actual notes.
+Notedown is a Markdown note taking app. It is a Flutter app that is meant to be used on mobile devices, the web, and desktop. It currently uses Firebase's Firestore to store notes and category information, and automatically saves data and fetches it from the database. It uses Google authentication to protect the notes and for syncing purposes, and allows for note editing/creation. It does not support markdown yet, however this is coming soon.
 
 Some screenshots of the current UI (All content is dynamic):
 
-![Screenshot 1]( https://rubbaboy.me/images/ty5b7av)
+![Note Listing](https://rubbaboy.me/images/vce9vat)
 
-![Screenshot 2]( https://rubbaboy.me/images/c97qcqa)
+![Note Edit](https://rubbaboy.me/images/h7yoxjp)
+
+![Categories](https://rubbaboy.me/images/3pna9a4)
