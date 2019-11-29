@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:notedown/enums/view_states.dart';
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
@@ -16,26 +15,31 @@ class NoteListModel extends BaseModel {
 
   set selectedTab(value) => navigationService.selectedTab = value;
 
-  Future refreshNotes(NoteCategory category) async {
+  void refreshNotes(NoteCategory category) {
     print('Loading notes for ${category.name}...');
-    setState(ViewState.Busy);
 
-    // TODO: Make #getCachedNotes() request category-specific notes
     _requestService.getCachedNotes(category).then((cached) {
-      category.notes =
-          cached.map((data) => NoteDisplay(note: data, model: this)).toList();
-      setState(ViewState.Retrieved);
+      category.notes = cached.notes
+          .map((data) => NoteDisplay(note: data, model: this))
+          .toList();
+      notifyListeners();
     });
   }
 
-  void openNote(BuildContext context, FetchedNote note) {
-    setState(ViewState.Busy);
-
+  void openNote(BuildContext context,
+      {String categoryId = '', FetchedNote note, Function(FetchedNote) save}) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => NoteEditView(note)));
-    setState(ViewState.Retrieved);
+            builder: (context) => NoteEditView(
+                note: note ?? FetchedNote('', categoryId, '', ''), save: save)));
+  }
+
+  void addNote(NoteCategory category, FetchedNote note) {
+    print('addNote() note cat: ${note.category}');
+    _requestService.addNote(note);
+    category.notes.add(NoteDisplay(note: note, model: this));
+    notifyListeners();
   }
 }
 

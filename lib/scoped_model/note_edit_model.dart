@@ -24,6 +24,13 @@ class NoteEditModel extends BaseModel {
     Future.delayed(Duration(milliseconds: 100), () => FocusScope.of(context).requestFocus(titleFocusNode));
   }
 
+  void tapBody() {
+    if (editingTitle) {
+      editingTitle = false;
+      notifyListeners();
+    }
+  }
+
   void reset(BuildContext context, TextEditingController titleController, TextEditingController contentController, FetchedNote note) {
     _titleController = titleController;
     _contentController = contentController;
@@ -43,12 +50,14 @@ class NoteEditModel extends BaseModel {
     );
   }
 
-  void dispose() {
+  void dispose(Function() saved) {
     keyboardVisibilityNotification.dispose();
-    save();
+    if (save()) {
+      saved();
+    }
   }
 
-  void save() {
+  bool save() {
     var oldContent = _note.content?.trim();
     var newContent = _contentController.text.trim();
 
@@ -60,8 +69,15 @@ class NoteEditModel extends BaseModel {
 
       _note.content = newContent;
       _note.title = newTitle;
-      functionsService.editNote(id: _note.id, title: newTitle, content: newContent);
+      functionsService.editNote(id: _note.id, categoryId: _note.category, title: newTitle, content: newContent);
+      return true;
     }
+
+    return false;
+  }
+
+  void titleChanged(String title) {
+    this.title = title;
   }
 
   void submitTitle(String title) {

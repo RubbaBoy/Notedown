@@ -5,8 +5,9 @@ import 'package:notedown/ui/views/base_view.dart';
 
 class NoteEditView extends StatefulWidget {
   final FetchedNote note;
+  final Function(FetchedNote) save;
 
-  NoteEditView(this.note);
+  NoteEditView({this.note, this.save});
 
   @override
   State<StatefulWidget> createState() => NoteEditViewState(note);
@@ -28,7 +29,11 @@ class NoteEditViewState extends State<NoteEditView> {
         contentController = TextEditingController(text: note.content);
         model.reset(context, titleController, contentController, note);
       },
-      onModelEnd: (model) => model.dispose(),
+      onModelEnd: (model) => model.dispose(() {
+        if (widget.save != null) {
+          widget.save(note);
+        }
+      }),
       builder: (context, child, model) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -52,6 +57,7 @@ class NoteEditViewState extends State<NoteEditView> {
                       : TextField(
                           autofocus: true,
                           onSubmitted: model.submitTitle,
+                          onChanged: model.titleChanged,
                           controller: titleController,
                           focusNode: model.titleFocusNode,
                           textAlign: TextAlign.center,
@@ -108,6 +114,7 @@ class NoteEditViewState extends State<NoteEditView> {
                 expands: true,
                 maxLengthEnforced: false,
                 enableInteractiveSelection: true,
+                onTap: model.tapBody,
                 controller: contentController,
                 focusNode: model.bodyFocusNode,
                 style: Theme.of(context).textTheme.body1.copyWith(fontSize: 16),

@@ -12,6 +12,7 @@ class BaseView<T extends BaseModel> extends StatefulWidget {
   final ScopedModelDescendantBuilder<T> _builder;
   final Function(T) onModelReady;
   final Function(T) onModelEnd;
+  final Function(T) fabAdd;
   final bool showFab;
 
   BaseView(
@@ -19,6 +20,7 @@ class BaseView<T extends BaseModel> extends StatefulWidget {
       ScopedModelDescendantBuilder<T> builder,
       this.onModelReady,
       this.onModelEnd,
+      this.fabAdd,
       this.showFab = true})
       : _scaffoldKey = scaffoldKey,
         _builder = builder;
@@ -43,7 +45,9 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
                 : FloatingActionButton(
                     child: Icon(Icons.add),
                     onPressed: () {
-                      print('Add note!');
+                      if (widget.fabAdd != null) {
+                        widget.fabAdd(_model);
+                      }
                     },
                   )),
             drawer: Drawer(

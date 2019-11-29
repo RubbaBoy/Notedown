@@ -69,8 +69,6 @@ class FunctionsService {
         throw FailedFunctionException('getNotes', data['error']);
       }
 
-      print('Notes:\n$data');
-
       return data['notes']
           .map<FetchedNote>((category) => FetchedNote(category['id'],
               category['categoryId'] ?? '', category['title'] ?? '', category['content'] ?? ''))

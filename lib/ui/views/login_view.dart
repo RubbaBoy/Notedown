@@ -8,7 +8,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EmptyView<LoginModel>(
-      onModelReady: (model) async => await model.checkAuthentication(context),
+      onModelReady: (model) => model.authService.checkAuthentication(context),
       builder: (context, child, model) => Container(
         color: Colors.white,
         child: Center(

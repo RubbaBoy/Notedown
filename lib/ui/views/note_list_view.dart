@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/ui/views/base_view.dart';
@@ -26,6 +27,16 @@ class NoteListViewState extends State<NoteListView> {
   Widget build(BuildContext context) {
     return BaseView<NoteListModel>(
       scaffoldKey: _scaffoldKey,
+      fabAdd: (model) {
+        model.openNote(context, categoryId: category.uuid == NoteCategory.allUuid ? '' : category.uuid, save: (note) {
+          if (note.title.isEmpty && note.content.isEmpty) {
+            Fluttertoast.showToast(msg: 'Discarded empty note');
+            return;
+          }
+
+          model.addNote(category, note);
+        });
+      },
       onModelReady: (model) => model.refreshNotes(category),
       builder: (context, child, model) => ListView(
         shrinkWrap: true,
@@ -82,17 +93,17 @@ class NoteDisplay extends StatefulWidget {
 class NoteState extends State<NoteDisplay> {
   final NoteListModel model;
   final FetchedNote note;
-  final String preview;
+  String preview;
 
-  NoteState({this.note, this.model})
-      : preview = note.content.substring(0, min(note.content.length, 200));
+  NoteState({this.note, this.model});
 
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
     var titleTheme = textTheme.subhead.copyWith(fontWeight: FontWeight.bold);
+    preview = note.content.substring(0, min(note.content.length, 200));
     return GestureDetector(
-      onTap: () => model.openNote(context, note),
+      onTap: () => model.openNote(context, note: note),
       child: Card(
         margin: const EdgeInsets.all(5),
         child: Padding(
