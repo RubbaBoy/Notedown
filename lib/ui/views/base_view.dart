@@ -11,11 +11,15 @@ class BaseView<T extends BaseModel> extends StatefulWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey;
   final ScopedModelDescendantBuilder<T> _builder;
   final Function(T) onModelReady;
+  final Function(T) onModelEnd;
+  final bool showFab;
 
   BaseView(
       {GlobalKey<ScaffoldState> scaffoldKey,
       ScopedModelDescendantBuilder<T> builder,
-      this.onModelReady})
+      this.onModelReady,
+      this.onModelEnd,
+      this.showFab})
       : _scaffoldKey = scaffoldKey,
         _builder = builder;
 
@@ -29,34 +33,31 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
 
   @override
   void initState() {
-    otherBuilder = (context, child, model) => BusyOverlay(
+    otherBuilder = (context, child, BaseModel model) => BusyOverlay(
           show: model.state == ViewState.Busy,
           child: Scaffold(
             key: widget._scaffoldKey,
-            floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                print('Add note!');
-              },
-            ),
+            floatingActionButton: (!widget.showFab
+                ? null
+                : FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: () {
+                      print('Add note!');
+                    },
+                  )),
             drawer: Drawer(
-              // Add a ListView to the drawer. This ensures the user can scroll
-              // through the options in the drawer if there isn't enough vertical
-              // space to fit everything.
               child: ListView(
-                // Important: Remove any padding from the ListView.
                 padding: EdgeInsets.zero,
                 children: <Widget>[
                   UserAccountsDrawerHeader(
-                    accountName: Text('Adam Yarris'),
-                    accountEmail: Text('adam@yarr.is'),
+                    accountName: Text(model.getProfileName()),
+                    accountEmail: Text(model.getProfileEmail()),
                     currentAccountPicture: Container(
                         decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
                         fit: BoxFit.cover,
-                        image: NetworkImage(
-                            'https://rubbaboy.me/images/5hy10o9.png'),
+                        image: NetworkImage(model.getProfilePicture()),
                       ),
                     )),
                   ),
@@ -78,9 +79,17 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
       widget.onModelReady(_model);
     }
 
-//    _model.navigationService.getCachedCategories();
-
     super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    if (widget.onModelEnd != null) {
+      widget.onModelEnd(_model);
+    }
+
+    super.dispose();
   }
 
   @override
@@ -102,7 +111,7 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
                   : Icons.home,
               category.name,
               id: category.index,
-              builder: (context) => NoteListView(category: category)))
+              builder: (context) => NoteListView(category)))
           ?.toList() ??
       [];
 
@@ -118,7 +127,10 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
       );
 
   ListTile drawerItem(BuildContext context, IconData icon, String name,
-      {bool selected = false, int id = -1, Function() onTap, WidgetBuilder builder}) {
+      {bool selected = false,
+      int id = -1,
+      Function() onTap,
+      WidgetBuilder builder}) {
     return ListTile(
         leading: Icon(icon),
         title: Text(name),

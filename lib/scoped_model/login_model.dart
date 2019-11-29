@@ -20,18 +20,18 @@ class LoginModel extends BaseModel {
     navigationService.getCachedCategories().then((_) {
       Navigator.pop(context);
       Navigator.push(
-        context, MaterialPageRoute(builder: (context) => NoteListView(category: NoteCategory.all)));
+        context, MaterialPageRoute(builder: (context) => NoteListView(NoteCategory.all)));
       setState(ViewState.Retrieved);
     });
   }
 
-  Future<void> checkAuthentication(BuildContext context) async {
+  Future checkAuthentication(BuildContext context) async {
     if (authService.isAuthenticated()) {
       _goToNotes(context);
     }
   }
 
-  Future<void> onPress(BuildContext context) async {
+  Future onPress(BuildContext context) async {
     print('Logging in...');
     authService.signIn().then((user) async {
       print('${user.displayName} logged in');

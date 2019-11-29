@@ -7,13 +7,20 @@ import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/ui/views/base_view.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 
-final double childrenMargin = 5;
+class NoteListView extends StatefulWidget {
+  final NoteCategory category;
 
-class NoteListView extends StatelessWidget {
+  NoteListView(this.category);
+
+  @override
+  State<StatefulWidget> createState() => NoteListViewState(category);
+}
+
+class NoteListViewState extends State<NoteListView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final NoteCategory category;
 
-  NoteListView({this.category});
+  NoteListViewState(this.category);
 
   @override
   Widget build(BuildContext context) {
@@ -63,44 +70,49 @@ class NoteListView extends StatelessWidget {
 }
 
 class NoteDisplay extends StatefulWidget {
+  final NoteListModel model;
   final FetchedNote note;
 
-  NoteDisplay({this.note});
+  NoteDisplay({this.note, this.model});
 
   @override
-  State<StatefulWidget> createState() => NoteState(note: note);
+  State<StatefulWidget> createState() => NoteState(note: note, model: model);
 }
 
 class NoteState extends State<NoteDisplay> {
+  final NoteListModel model;
   final FetchedNote note;
   final String preview;
 
-  NoteState({this.note})
+  NoteState({this.note, this.model})
       : preview = note.content.substring(0, min(note.content.length, 200));
 
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
     var titleTheme = textTheme.subhead.copyWith(fontWeight: FontWeight.bold);
-    return Card(
-      margin: EdgeInsets.all(childrenMargin),
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-              child: Text(
-                note.title,
-                style: titleTheme,
+    return GestureDetector(
+      onTap: () => model.openNote(context, note),
+      child: Card(
+        margin: const EdgeInsets.all(5),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Text(
+                  note.title,
+                  style: titleTheme,
+                ),
               ),
-            ),
-            Text(
-              preview,
-              style: Theme.of(context).textTheme.body1,
-            ),
-          ],
+              Text(
+                preview,
+                style: Theme.of(context).textTheme.body1,
+              ),
+            ],
+          ),
         ),
       ),
     );

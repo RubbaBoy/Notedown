@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:notedown/scoped_model/error_model.dart';
 import 'package:notedown/scoped_model/login_model.dart';
+import 'package:notedown/scoped_model/note_edit_model.dart';
 import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/services/authentication_service.dart';
 import 'package:notedown/services/functions_service.dart';
@@ -18,6 +19,7 @@ void setupLocator() {
 
   // Register models
   locator.registerFactory<NoteListModel>(() => NoteListModel());
+  locator.registerFactory<NoteEditModel>(() => NoteEditModel());
   locator.registerFactory<ErrorModel>(() => ErrorModel());
   locator.registerFactory<LoginModel>(() => LoginModel());
 }
