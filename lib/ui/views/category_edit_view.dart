@@ -19,78 +19,82 @@ class CategoryEditViewState extends State<CategoryEditView> {
     hintStyle =
         textStyle.copyWith(fontSize: 18, color: textStyle.color.withAlpha(127));
     return BaseView<CategoryEditModel>(
-      showFab: false,
-      onModelReady: (model) {},
-      builder: (context, child, model) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              getLeftAction(
-                icon: Icons.arrow_back,
-                onPressed: () => Navigator.pop(context),
-              ),
-              Text(
-                'Edit categories',
-                style: Theme.of(context).textTheme.headline,
-                textAlign: TextAlign.left,
-              ),
-            ],
-          ),
-          // This and the SizedBox is to essentially move the Divider up by 8px
-          Divider(height: 8),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(children: [
-                Row(
-                  children: [
-                    if (!model.topFocus)
-                      getLeftAction(
-                        icon: Icons.add,
-                        onPressed: () => model.startCreating(context),
-                      ),
-                    if (model.topFocus)
-                      getLeftAction(
-                        icon: Icons.clear,
-                        onPressed: () => model.endCreating(),
-                      ),
-                    Expanded(
-                      child: TextField(
-                        autofocus: false,
-                        focusNode: model.topFocusNode,
-                        controller: model.topController,
-                        onSubmitted: (_) => model.createCategory(),
-                        onEditingComplete: () => model.createCategory(),
-                        textAlign: TextAlign.left,
-                        style: textStyle,
-                        decoration: InputDecoration(
-                          hintStyle: hintStyle,
-                          hintText: 'Create new category',
-                          border: InputBorder.none,
+        showFab: false,
+        onModelReady: (model) {},
+        builder: (context, child, model) => WillPopScope(
+          onWillPop: () => model.handlePop(context),
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                getLeftAction(
+                  icon: Icons.arrow_back,
+                  onPressed: () => model.handlePop(context),
+                ),
+                Text(
+                  'Edit categories',
+                  style: Theme.of(context).textTheme.headline,
+                  textAlign: TextAlign.left,
+                ),
+              ],
+            ),
+            // This and the SizedBox is to essentially move the Divider up by 8px
+            Divider(height: 8),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(children: [
+                  Row(
+                    children: [
+                      if (!model.topFocus)
+                        getLeftAction(
+                          icon: Icons.add,
+                          onPressed: () => model.startCreating(context),
+                        ),
+                      if (model.topFocus)
+                        getLeftAction(
+                          icon: Icons.clear,
+                          onPressed: () => model.endCreating(),
+                        ),
+                      Expanded(
+                        child: TextField(
+                          autofocus: false,
+                          focusNode: model.topFocusNode,
+                          controller: model.topController,
+                          onSubmitted: (_) => model.createCategory(),
+                          onEditingComplete: () => model.createCategory(),
+                          textAlign: TextAlign.left,
+                          style: textStyle,
+                          decoration: InputDecoration(
+                            hintStyle: hintStyle,
+                            hintText: 'Create new category',
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
-                    ),
-                    if (model.topFocus)
-                      getButton(
-                        icon: Icons.check,
-                        color: Colors.blue,
-                        padding: EdgeInsets.fromLTRB(32, 16, 16, 16),
-                        onPressed: () => model.createCategory(),
-                      ),
-                  ],
-                ),
-                getDivider(context, model.showTopDivider()),
-                ...getCategoryDisplays(context, model),
-              ]),
+                      if (model.topFocus)
+                        getButton(
+                          icon: Icons.check,
+                          color: Colors.blue,
+                          padding: EdgeInsets.fromLTRB(32, 16, 16, 16),
+                          onPressed: () => model.createCategory(),
+                        ),
+                    ],
+                  ),
+                  getDivider(context, model.showTopDivider()),
+                  ...getCategoryDisplays(context, model),
+                ]),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  List<Widget> getCategoryDisplays(BuildContext context, CategoryEditModel model) =>
+  List<Widget> getCategoryDisplays(
+          BuildContext context, CategoryEditModel model) =>
       model.fetchedCategories
           .map(
             (category) => Dismissible(

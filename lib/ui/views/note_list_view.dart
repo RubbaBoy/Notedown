@@ -28,7 +28,10 @@ class NoteListViewState extends State<NoteListView> {
     return BaseView<NoteListModel>(
       scaffoldKey: _scaffoldKey,
       fabAdd: (model) {
-        model.openNote(context, categoryId: category.uuid == NoteCategory.allUuid ? '' : category.uuid, save: (note) {
+        model.openNote(context,
+            categoryId: category.uuid == NoteCategory.allUuid
+                ? ''
+                : category.uuid, save: (note) {
           if (note.title.isEmpty && note.content.isEmpty) {
             Fluttertoast.showToast(msg: 'Discarded empty note');
             return;
@@ -37,45 +40,44 @@ class NoteListViewState extends State<NoteListView> {
           model.addNote(category, note);
         });
       },
-      onModelReady: (model) => model.refreshNotes(category),
+      onModelReady: (model) => model.refreshNotes(context, category),
       builder: (context, child, model) => ListView(
-        shrinkWrap: true,
-        children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-            child: Container(
-              color: Theme.of(context).cardColor,
-              padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.menu),
-                    onPressed: () => _scaffoldKey.currentState.openDrawer(),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search notes',
-                          border: InputBorder.none,
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+              child: Card(
+                color: Theme.of(context).cardColor,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.menu),
+                      onPressed: () => _scaffoldKey.currentState.openDrawer(),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search notes',
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(OMIcons.viewAgenda),
-                    onPressed: () {
-                      print('Changed view type!');
-                    },
-                  ),
-                ],
+                    IconButton(
+                      icon: Icon(OMIcons.viewAgenda),
+                      onPressed: () {
+                        print('Changed view type!');
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          NoteWrap(noteCategory: category),
-        ],
-      ),
+            NoteWrap(noteCategory: category),
+          ],
+        ),
     );
   }
 }
@@ -147,7 +149,7 @@ class NoteWrapState extends State<NoteWrap> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 20, 15, 0),
+      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
       child: CustomScrollView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

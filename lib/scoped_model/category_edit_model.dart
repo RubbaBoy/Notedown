@@ -8,15 +8,17 @@ import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/services/navigation_service.dart';
+import 'package:notedown/services/request_service.dart';
 import 'package:uuid/uuid.dart';
 
 class CategoryEditModel extends BaseModel {
   final functionsService = locator<FunctionsService>();
   final navigationService = locator<NavigationService>();
+  final requestService = locator<RequestService>();
   final uuid = Uuid();
-  
+
   List<NoteCategory> fetchedCategories = [];
-  
+
   Map<NoteCategory, FocusNode> categoryFocuses = {};
   Map<NoteCategory, TextEditingController> categoryControllers = {};
   NoteCategory inFocusCategory;
@@ -41,6 +43,12 @@ class CategoryEditModel extends BaseModel {
     });
   }
 
+  Future<bool> handlePop(BuildContext context) {
+    Navigator.pushAndRemoveUntil(context, NavigationService.getRouteOf(NoteCategory.all), (_) => false);
+    navigationService.selectedTab = 0;
+    return Future.value(false);
+  }
+
   TextEditingController getController(NoteCategory category) =>
       categoryControllers[category] ??=
           TextEditingController(text: category.name);
@@ -50,10 +58,12 @@ class CategoryEditModel extends BaseModel {
 
   bool showDivider(NoteCategory category) =>
       hasFocus(category) ||
-      hasFocus(
-          fetchedCategories[min(fetchedCategories.length - 1, fetchedCategories.indexOf(category) + 1)]);
+      hasFocus(fetchedCategories[min(fetchedCategories.length - 1,
+          fetchedCategories.indexOf(category) + 1)]);
 
-  bool showTopDivider() => topFocus || hasFocus(fetchedCategories.isNotEmpty ? fetchedCategories.first : null);
+  bool showTopDivider() =>
+      topFocus ||
+      hasFocus(fetchedCategories.isNotEmpty ? fetchedCategories.first : null);
 
   FocusNode _createFocus(NoteCategory category) {
     var focus = FocusNode();
@@ -96,6 +106,11 @@ class CategoryEditModel extends BaseModel {
     fetchedCategories.remove(category);
     categoryFocuses.remove(category);
     categoryControllers.remove(category);
+
+    category.removed = true;
+    functionsService.removeCategory(category.uuid);
+    navigationService.removeCategory(category);
+
     notifyListeners();
   }
 
@@ -104,10 +119,8 @@ class CategoryEditModel extends BaseModel {
   void createCategory() {
     var text = topController.text.trim();
     if (text.isNotEmpty) {
-      print('Creating category: $text');
-      fetchedCategories
-          .add(NoteCategory(uuid: uuid.v4(), index: navigationService.nextIndex(), name: text));
-      print(fetchedCategories);
+      fetchedCategories.add(NoteCategory(
+          uuid: uuid.v4(), index: navigationService.nextIndex(), name: text));
     }
 
     endCreating();

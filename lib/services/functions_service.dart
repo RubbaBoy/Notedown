@@ -5,10 +5,14 @@ class FunctionsService {
       CloudFunctions.instance.getHttpsCallable(functionName: 'addCategory');
   final HttpsCallable _getCategoriesCallable =
       CloudFunctions.instance.getHttpsCallable(functionName: 'getCategories');
+  final HttpsCallable _removeCategoryCallable =
+      CloudFunctions.instance.getHttpsCallable(functionName: 'removeCategory');
   final HttpsCallable _editNoteCallable =
       CloudFunctions.instance.getHttpsCallable(functionName: 'editNote');
   final HttpsCallable _getNotesCallable =
       CloudFunctions.instance.getHttpsCallable(functionName: 'getNotes');
+  final HttpsCallable _removeNoteCallable =
+      CloudFunctions.instance.getHttpsCallable(functionName: 'removeNote');
 
   /// Returns the created category ID.
   Future<String> addCategory(String name) async {
@@ -41,6 +45,22 @@ class FunctionsService {
     }
   }
 
+  /// Removes the given category. Notes with the category will not be affected
+  /// whatsoever, as that would be an easy way to use up all the Firebase
+  /// reads/writes.
+  Future removeCategory(String categoryId) async {
+    try {
+      // Returns a list of new categories as data['categories'] however this is useless for now
+      var data =
+          (await _removeCategoryCallable.call({'category': categoryId})).data;
+      if (!data['success']) {
+        throw FailedFunctionException('removeCategory', data['error']);
+      }
+    } on CloudFunctionsException catch (e) {
+      throw FailedFunctionException('removeCategory', e.message);
+    }
+  }
+
   /// Edits or creates the note by ID. Returns the note's ID.
   Future<String> editNote(
       {String id, String categoryId, String title, String content}) async {
@@ -70,11 +90,27 @@ class FunctionsService {
       }
 
       return data['notes']
-          .map<FetchedNote>((category) => FetchedNote(category['id'],
-              category['categoryId'] ?? '', category['title'] ?? '', category['content'] ?? ''))
+          .map<FetchedNote>((category) => FetchedNote(
+              category['id'],
+              category['categoryId'] ?? '',
+              category['title'] ?? '',
+              category['content'] ?? ''))
           .toList();
     } on CloudFunctionsException catch (e) {
       throw FailedFunctionException('getNotes', e.message);
+    }
+  }
+
+  /// Removes the given note.
+  Future removeNote(String noteId) async {
+    try {
+      var data =
+          (await _removeNoteCallable.call({'note': noteId})).data;
+      if (!data['success']) {
+        throw FailedFunctionException('removeNote', data['error']);
+      }
+    } on CloudFunctionsException catch (e) {
+      throw FailedFunctionException('removeNote', e.message);
     }
   }
 }
@@ -88,9 +124,9 @@ class FetchedCategory {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is FetchedCategory &&
-              runtimeType == other.runtimeType &&
-              id == other.id;
+      other is FetchedCategory &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
