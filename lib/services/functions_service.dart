@@ -84,6 +84,19 @@ class FetchedCategory {
   String name;
 
   FetchedCategory(this.id, this.name);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is FetchedCategory &&
+              runtimeType == other.runtimeType &&
+              id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  String toString() => 'FetchedCategory[id=$id,name=$name]';
 }
 
 class FetchedNote {
