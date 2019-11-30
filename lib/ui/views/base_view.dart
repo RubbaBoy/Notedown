@@ -3,6 +3,7 @@ import 'package:notedown/enums/view_states.dart';
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/service_locator.dart';
+import 'package:notedown/ui/views/category_edit_view.dart';
 import 'package:notedown/ui/views/note_list_view.dart';
 import 'package:notedown/ui/widgets/busy_overlay.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -74,9 +75,10 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
                 ],
               ),
             ),
-            body: SafeArea(
-              child: widget._builder(context, child, model),
-            ),
+            body: Builder(
+                builder: (context) => SafeArea(
+                      child: widget._builder(context, child, model),
+                    )),
           ),
         );
 
@@ -86,7 +88,6 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
 
     super.initState();
   }
-
 
   @override
   void dispose() {
@@ -107,18 +108,21 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
         ));
   }
 
-  List<ListTile> getCategoryTiles(BuildContext context) =>
-      _model.navigationService.categories
-          ?.map((category) => drawerItem(
-              context,
-              category.type == CategoryType.Named
-                  ? Icons.label_outline
-                  : Icons.home,
-              category.name,
-              id: category.index,
-              builder: (context) => NoteListView(category)))
-          ?.toList() ??
-      [];
+  List<ListTile> getCategoryTiles(BuildContext context) => [
+        ..._model.navigationService.categories
+                ?.map((category) => drawerItem(
+                    context,
+                    category.type == CategoryType.Named
+                        ? Icons.label_outline
+                        : Icons.home,
+                    category.name,
+                    id: category.index,
+                    builder: (context) => NoteListView(category)))
+                ?.toList() ??
+            [],
+        drawerItem(context, Icons.edit, 'Manage Categories',
+            id: -1, builder: (context) => CategoryEditView()),
+      ];
 
   Divider drawerSeparator() => Divider();
 
@@ -146,7 +150,9 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
             onTap();
           } else if (builder != null) {
             Navigator.push(context, MaterialPageRoute(builder: builder));
-            _model.navigationService.selectedTab = id;
+            if (id >= 0) {
+              _model.navigationService.selectedTab = id;
+            }
           }
         });
   }

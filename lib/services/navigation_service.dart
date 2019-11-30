@@ -5,6 +5,7 @@ import 'package:notedown/services/functions_service.dart';
 class NavigationService {
   FunctionsService functionsService = locator<FunctionsService>();
 
+  int index = 1;
   int selectedTab = 0;
   List<NoteCategory> categories;
 
@@ -13,9 +14,11 @@ class NavigationService {
 
     var categories = await functionsService.getCategories();
     print('Found ${categories.length} categories');
-    var index = 1;
+    index = 1;
     return [NoteCategory.all, ...categories.map<NoteCategory>((fetched) => NoteCategory(uuid: fetched.id, index: index++, name: fetched.name)).toList()];
   }
 
   Future<List<NoteCategory>> getCachedCategories() async => categories ?? (categories = await fetchCategories());
+
+  int nextIndex() => index++;
 }

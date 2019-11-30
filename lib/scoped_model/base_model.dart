@@ -1,5 +1,4 @@
 import 'package:notedown/enums/view_states.dart';
-import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/authentication_service.dart';
 import 'package:notedown/services/navigation_service.dart';
@@ -14,8 +13,6 @@ class BaseModel extends Model {
 
   ViewState _state;
   ViewState get state => _state;
-
-  Future<List<NoteCategory>> get categories async => navigationService.getCachedCategories();
 
   void setState(ViewState newState) {
     _state = newState;

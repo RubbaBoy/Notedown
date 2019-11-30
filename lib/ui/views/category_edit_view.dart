@@ -81,7 +81,7 @@ class CategoryEditViewState extends State<CategoryEditView> {
                   ],
                 ),
                 getDivider(context, model.showTopDivider()),
-                ...getCategoryDisplays(model),
+                ...getCategoryDisplays(context, model),
               ]),
             ),
           ),
@@ -90,11 +90,11 @@ class CategoryEditViewState extends State<CategoryEditView> {
     );
   }
 
-  List<Widget> getCategoryDisplays(CategoryEditModel model) =>
+  List<Widget> getCategoryDisplays(BuildContext context, CategoryEditModel model) =>
       model.fetchedCategories
           .map(
             (category) => Dismissible(
-              key: Key(category.id),
+              key: Key(category.uuid),
               onDismissed: (_) => model.onDelete(context, category),
               confirmDismiss: (_) async => await confirmDelete(),
               background: Container(

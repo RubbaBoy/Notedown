@@ -4,19 +4,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:notedown/scoped_model/base_model.dart';
+import 'package:notedown/scoped_model/note_list_model.dart';
+import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
+import 'package:notedown/services/navigation_service.dart';
+import 'package:uuid/uuid.dart';
 
 class CategoryEditModel extends BaseModel {
-  List<FetchedCategory> fetchedCategories = [
-    FetchedCategory('111', 'One'),
-    FetchedCategory('222', 'Two'),
-    FetchedCategory('333', 'Three'),
-    FetchedCategory('444', 'Four'),
-    FetchedCategory('555', 'Five')
-  ];
-  Map<FetchedCategory, FocusNode> categoryFocuses = {};
-  Map<FetchedCategory, TextEditingController> categoryControllers = {};
-  FetchedCategory inFocusCategory;
+  final functionsService = locator<FunctionsService>();
+  final navigationService = locator<NavigationService>();
+  final uuid = Uuid();
+  
+  List<NoteCategory> fetchedCategories = [];
+  
+  Map<NoteCategory, FocusNode> categoryFocuses = {};
+  Map<NoteCategory, TextEditingController> categoryControllers = {};
+  NoteCategory inFocusCategory;
   bool topFocus = false;
 
   TextEditingController topController = TextEditingController();
@@ -31,23 +34,28 @@ class CategoryEditModel extends BaseModel {
 
       notifyListeners();
     });
+
+    navigationService.getCachedCategories().then((categories) {
+      fetchedCategories = categories;
+      notifyListeners();
+    });
   }
 
-  TextEditingController getController(FetchedCategory category) =>
+  TextEditingController getController(NoteCategory category) =>
       categoryControllers[category] ??=
           TextEditingController(text: category.name);
 
-  FocusNode addFocus(FetchedCategory category) =>
+  FocusNode addFocus(NoteCategory category) =>
       categoryFocuses[category] ??= _createFocus(category);
 
-  bool showDivider(FetchedCategory category) =>
+  bool showDivider(NoteCategory category) =>
       hasFocus(category) ||
       hasFocus(
           fetchedCategories[min(fetchedCategories.length - 1, fetchedCategories.indexOf(category) + 1)]);
 
-  bool showTopDivider() => topFocus || hasFocus(fetchedCategories[0]);
+  bool showTopDivider() => topFocus || hasFocus(fetchedCategories.isNotEmpty ? fetchedCategories.first : null);
 
-  FocusNode _createFocus(FetchedCategory category) {
+  FocusNode _createFocus(NoteCategory category) {
     var focus = FocusNode();
     focus.addListener(() {
       if (focus.hasFocus) {
@@ -57,18 +65,18 @@ class CategoryEditModel extends BaseModel {
 
         inFocusCategory = category;
         notifyListeners();
-        print('${category.id} is now in focus!');
+        print('${category.uuid} is now in focus!');
       }
     });
     return focus;
   }
 
-  void onSubmit(FetchedCategory category) {
+  void onSubmit(NoteCategory category) {
     var submitted = getController(category).text;
-    print('Submitting for ID: ${category.id} = $submitted');
+    print('Submitting for ID: ${category.uuid} = $submitted');
   }
 
-  void onCheck(FetchedCategory category) {
+  void onCheck(NoteCategory category) {
     categoryFocuses[inFocusCategory]?.unfocus();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     inFocusCategory = null;
@@ -76,9 +84,7 @@ class CategoryEditModel extends BaseModel {
     onSubmit(category);
   }
 
-  void onDelete(BuildContext context, FetchedCategory category) {
-    print('Deletinggg ${category.id}');
-
+  void onDelete(BuildContext context, NoteCategory category) {
     Scaffold.of(context).showSnackBar(SnackBar(
       content: Text("${category.name} deleted"),
     ));
@@ -93,16 +99,14 @@ class CategoryEditModel extends BaseModel {
     notifyListeners();
   }
 
-  bool hasFocus(FetchedCategory category) => category == inFocusCategory;
-
-  var temp = 10;
+  bool hasFocus(NoteCategory category) => category == inFocusCategory;
 
   void createCategory() {
     var text = topController.text.trim();
     if (text.isNotEmpty) {
       print('Creating category: $text');
       fetchedCategories
-          .add(FetchedCategory('${temp++}' * 3, text));
+          .add(NoteCategory(uuid: uuid.v4(), index: navigationService.nextIndex(), name: text));
       print(fetchedCategories);
     }
 
