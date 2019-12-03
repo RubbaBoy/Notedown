@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:notedown/scoped_model/note_edit_model.dart';
 import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/ui/views/base_view.dart';
@@ -43,12 +45,12 @@ class NoteEditViewState extends State<NoteEditView> {
               IconButton(
                 padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
                 icon: Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(context),
               ),
               Expanded(
                 child: GestureDetector(
                   onTap: () => model.tapTitle(context),
-                  child: (!model.editingTitle
+                  child: !model.editingTitle
                       ? Text(
                           model.title,
                           style: Theme.of(context).textTheme.headline,
@@ -67,60 +69,73 @@ class NoteEditViewState extends State<NoteEditView> {
                             hintText: 'Title',
                             border: UnderlineInputBorder(),
                           ),
-                        )),
+                        ),
                 ),
               ),
-              SizedBox(width: 48),
+              IconButton(
+                padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
+                icon: Icon(
+                    model.editingContent ? Icons.remove_red_eye : Icons.edit),
+                onPressed: model.toggleEdit,
+              ),
             ],
           ),
           // This and the SizedBox is to essentially move the Divider up by 8px
-          Divider(height: 8),
-          SizedBox(height: 8),
+          const Divider(height: 8),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               getFormatButton(
-                icon: Icons.format_bold,
-                onPressed: () => print('Bold'),
-              ),
+                  model: model, icon: Icons.format_bold, format: Format.bold),
               getFormatButton(
-                icon: Icons.format_italic,
-                onPressed: () => print('Italics'),
-              ),
+                  model: model,
+                  icon: Icons.format_italic,
+                  format: Format.italics),
               getFormatButton(
-                icon: Icons.format_underlined,
-                onPressed: () => print('Underline'),
-              ),
+                  model: model,
+                  icon: Icons.format_underlined,
+                  format: Format.underline),
               getFormatButton(
-                icon: Icons.format_quote,
-                onPressed: () => print('Quote'),
-              ),
+                  model: model, icon: Icons.format_quote, format: Format.quote),
               getFormatButton(
-                icon: Icons.code,
-                onPressed: () => print('Code'),
-              ),
+                  model: model, icon: Icons.code, format: Format.code),
               getFormatButton(
-                icon: Icons.format_list_bulleted,
-                onPressed: () => print('Bullet'),
-              ),
+                  model: model,
+                  icon: Icons.format_list_bulleted,
+                  format: Format.list),
             ],
           ),
-          Divider(),
+          const Divider(),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: TextField(
-                maxLines: null,
-                expands: true,
-                maxLengthEnforced: false,
-                enableInteractiveSelection: true,
+              child: GestureDetector(
+                child: model.editingContent
+                    ? TextField(
+                        maxLines: null,
+                        expands: true,
+                        maxLengthEnforced: false,
+                        enableInteractiveSelection: true,
+                        onTap: model.tapBody,
+                        keyboardType: TextInputType.multiline,
+                        controller: contentController,
+                        focusNode: model.bodyFocusNode,
+                        style: Theme.of(context)
+                            .textTheme
+                            .body1
+                            .copyWith(fontSize: 16),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Html(
+                          data: md.markdownToHtml(contentController.text),
+                        ),
+                      ),
+                onDoubleTap: () => model.doubleTapHtml(context),
                 onTap: model.tapBody,
-                controller: contentController,
-                focusNode: model.bodyFocusNode,
-                style: Theme.of(context).textTheme.body1.copyWith(fontSize: 16),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                ),
               ),
             ),
           ),
@@ -129,9 +144,16 @@ class NoteEditViewState extends State<NoteEditView> {
     );
   }
 
-  Widget getFormatButton({@required IconData icon, Function() onPressed}) =>
+  Widget getFormatButton(
+          {@required IconData icon,
+          @required NoteEditModel model,
+          @required Format format}) =>
       getButton(
-          icon: icon, size: 30, vpadding: 0, hpadding: 0, onPressed: onPressed);
+          icon: icon,
+          size: 30,
+          vpadding: 0,
+          hpadding: 0,
+          onPressed: () => format.press(model));
 
   Widget getButton(
           {@required IconData icon,

@@ -26,10 +26,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // https://github.com/flutter/flutter/issues/35826#issuecomment-559239389
       theme: ThemeData.dark().copyWith(
-          buttonTheme: ButtonThemeData(minWidth: 12),
-          splashColor: Colors.transparent,
+        buttonTheme: const ButtonThemeData(minWidth: 12),
+        splashColor: Colors.transparent,
       ),
-//          home: Scaffold(body: CategoryEditView()),
       home: FutureBuilder(
         future: _memoizer.runOnce(() async => authService.trySilent().then((user) async {
           if (user == null) return null;

@@ -12,7 +12,6 @@ class AuthService {
   final functionsService = locator<FunctionsService>();
   final navigationService = locator<NavigationService>();
   final _googleSignIn = GoogleSignIn();
-  final _auth = FirebaseAuth.instance;
 
   FirebaseUser user;
 
@@ -37,7 +36,7 @@ class AuthService {
       idToken: googleAuth.idToken,
     );
 
-    return user = (await _auth.signInWithCredential(credential)).user;
+    return user = (await FirebaseAuth.instance.signInWithCredential(credential)).user;
   }
 
   void goToNotes(BuildContext context) {

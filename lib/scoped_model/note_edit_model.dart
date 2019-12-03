@@ -10,8 +10,9 @@ class NoteEditModel extends BaseModel {
   FocusNode titleFocusNode = FocusNode();
   FocusNode bodyFocusNode = FocusNode();
   bool editingTitle = false;
-  TextEditingController _titleController;
-  TextEditingController _contentController;
+  bool editingContent = false;
+  TextEditingController titleController;
+  TextEditingController contentController;
 
   FetchedNote _note;
 
@@ -31,9 +32,24 @@ class NoteEditModel extends BaseModel {
     }
   }
 
+  void toggleEdit() {
+    editingContent = !editingContent;
+    editingTitle = false;
+    notifyListeners();
+  }
+
+  void doubleTapHtml(BuildContext context) {
+    contentController.selection = contentController.selection.copyWith(affinity: TextAffinity.downstream);
+    editingContent = !editingContent;
+    editingTitle = false;
+    notifyListeners();
+
+    Future.delayed(const Duration(milliseconds: 100), () => FocusScope.of(context).requestFocus(bodyFocusNode));
+  }
+
   void reset(BuildContext context, TextEditingController titleController, TextEditingController contentController, FetchedNote note) {
-    _titleController = titleController;
-    _contentController = contentController;
+    this.titleController = titleController;
+    this.contentController = contentController;
     _note = note;
     title = _note.title;
 
@@ -42,7 +58,7 @@ class NoteEditModel extends BaseModel {
         if (!visible) {
           FocusScopeNode currentFocus = FocusScope.of(context);
           if (currentFocus.focusedChild == titleFocusNode) {
-            submitTitle(_titleController.text);
+            submitTitle(this.titleController.text);
           }
           currentFocus.unfocus();
         }
@@ -59,14 +75,12 @@ class NoteEditModel extends BaseModel {
 
   bool save() {
     var oldContent = _note.content?.trim();
-    var newContent = _contentController.text.trim();
+    var newContent = contentController.text.trim();
 
     var oldTitle = _note.title?.trim();
     var newTitle = title.trim();
 
     if (oldContent != newContent || oldTitle != newTitle) {
-      print('Saving...');
-
       _note.content = newContent;
       _note.title = newTitle;
       functionsService.editNote(id: _note.id, categoryId: _note.category, title: newTitle, content: newContent);
@@ -84,5 +98,63 @@ class NoteEditModel extends BaseModel {
     this.title = title;
     editingTitle = false;
     notifyListeners();
+  }
+}
+
+enum Format {
+  bold, italics, underline, quote, code, list
+}
+
+extension FormatPress on Format {
+
+  void press(NoteEditModel model) {
+    final content = model.contentController;
+    final text = content.text;
+    final selection = content.selection;
+    final multiChar = selection.start != selection.end;
+    print(selection);
+
+    void formatBold() {
+      print(text.substring(0, selection.start));
+      print(text.substring(selection.start, selection.end));
+      print(text.substring(selection.end));
+      final middle = !multiChar ? '' : text.substring(selection.start, selection.end);
+      content.text = '${text.substring(0, selection.start)}**$middle**${text.substring(selection.end)}';
+
+      if (multiChar) {
+        content.selection = content.selection.copyWith(baseOffset: selection.start + 2, extentOffset: selection.end + 2);
+      } else {
+        content.selection = content.selection.copyWith(baseOffset: selection.start + 2);
+      }
+    }
+
+    void formatItalics() {
+
+    }
+
+    void formatUnderline() {
+
+    }
+
+    void formatQuote() {
+
+    }
+
+    void formatCode() {
+
+    }
+
+    void formatList() {
+
+    }
+
+    return {
+      Format.bold: formatBold,
+      Format.italics: formatItalics,
+      Format.underline: formatUnderline,
+      Format.quote: formatQuote,
+      Format.code: formatCode,
+      Format.list: formatList,
+    }[this]();
   }
 }
