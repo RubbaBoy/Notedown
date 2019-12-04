@@ -96,7 +96,7 @@ class CategoryEditModel extends BaseModel {
 
   void onDelete(BuildContext context, NoteCategory category) {
     Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text("${category.name} deleted"),
+      content: Text('${category.name} deleted'),
     ));
 
     categoryFocuses[inFocusCategory]?.unfocus();

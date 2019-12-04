@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:notedown/scoped_model/base_model.dart';
@@ -22,7 +24,7 @@ class NoteEditModel extends BaseModel {
     editingTitle = true;
     notifyListeners();
 
-    Future.delayed(Duration(milliseconds: 100), () => FocusScope.of(context).requestFocus(titleFocusNode));
+    Future.delayed(const Duration(milliseconds: 100), () => FocusScope.of(context).requestFocus(titleFocusNode));
   }
 
   void tapBody() {
@@ -56,7 +58,7 @@ class NoteEditModel extends BaseModel {
     keyboardVisibilityNotification.addNewListener(
       onChange: (visible) {
         if (!visible) {
-          FocusScopeNode currentFocus = FocusScope.of(context);
+          final currentFocus = FocusScope.of(context);
           if (currentFocus.focusedChild == titleFocusNode) {
             submitTitle(this.titleController.text);
           }
@@ -74,11 +76,11 @@ class NoteEditModel extends BaseModel {
   }
 
   bool save() {
-    var oldContent = _note.content?.trim();
-    var newContent = contentController.text.trim();
+    final oldContent = _note.content?.trim();
+    final newContent = contentController.text.trim();
 
-    var oldTitle = _note.title?.trim();
-    var newTitle = title.trim();
+    final oldTitle = _note.title?.trim();
+    final newTitle = title.trim();
 
     if (oldContent != newContent || oldTitle != newTitle) {
       _note.content = newContent;
@@ -112,41 +114,39 @@ extension FormatPress on Format {
     final text = content.text;
     final selection = content.selection;
     final multiChar = selection.start != selection.end;
-    print(selection);
 
-    void formatBold() {
-      print(text.substring(0, selection.start));
-      print(text.substring(selection.start, selection.end));
-      print(text.substring(selection.end));
+    void surroundIn(String surround) {
       final middle = !multiChar ? '' : text.substring(selection.start, selection.end);
-      content.text = '${text.substring(0, selection.start)}**$middle**${text.substring(selection.end)}';
-
-      if (multiChar) {
-        content.selection = content.selection.copyWith(baseOffset: selection.start + 2, extentOffset: selection.end + 2);
-      } else {
-        content.selection = content.selection.copyWith(baseOffset: selection.start + 2);
-      }
+      content.text = '${text.substring(0, selection.start)}$surround$middle$surround${text.substring(selection.end)}';
+      content.selection = content.selection.copyWith(baseOffset: selection.start + surround.length, extentOffset: selection.end + surround.length);
     }
 
-    void formatItalics() {
+    void prefixWith(String prefix) {
+      final newline = max(-1, text.lastIndexOf(RegExp(r'(\n|^)'), max(0, selection.start - 1))) + 1;
 
+      content.text = '${text.substring(0, newline - 1)}$prefix${text.substring(newline, text.length - 1)}';
+      content.selection = content.selection.copyWith(baseOffset: newline + prefix.length);
     }
 
-    void formatUnderline() {
+    void formatBold() => surroundIn('**');
 
-    }
+    void formatItalics() => surroundIn('*');
 
-    void formatQuote() {
+    void formatUnderline() => surroundIn('__');
 
-    }
+    void formatQuote() => prefixWith('\n> ');
 
     void formatCode() {
+      final newline = max(-1, text.lastIndexOf(RegExp(r'(\n|^)'), max(0, selection.start - 1))) + 1;
+      final end = max(-1, text.indexOf(RegExp(r'(\n|$)'), selection.end));
 
+      final hasEnd = end < text.length - 1;
+      final afterTick = hasEnd ? text.substring(end, text.length - 1) : '';
+      content.text = '${text.substring(0, newline)}```\n${text.substring(newline, end)}\n```$afterTick';
+      content.selection = content.selection.copyWith(baseOffset: newline, extentOffset: newline);
     }
 
-    void formatList() {
-
-    }
+    void formatList() => prefixWith('\n- ');
 
     return {
       Format.bold: formatBold,
