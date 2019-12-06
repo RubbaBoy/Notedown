@@ -8,7 +8,8 @@ import 'package:notedown/services/functions_service.dart';
 
 class NoteEditModel extends BaseModel {
   FunctionsService functionsService = locator<FunctionsService>();
-  KeyboardVisibilityNotification keyboardVisibilityNotification = KeyboardVisibilityNotification();
+  KeyboardVisibilityNotification keyboardVisibilityNotification =
+      KeyboardVisibilityNotification();
   FocusNode titleFocusNode = FocusNode();
   FocusNode bodyFocusNode = FocusNode();
   bool editingTitle = false;
@@ -24,7 +25,8 @@ class NoteEditModel extends BaseModel {
     editingTitle = true;
     notifyListeners();
 
-    Future.delayed(const Duration(milliseconds: 100), () => FocusScope.of(context).requestFocus(titleFocusNode));
+    Future.delayed(const Duration(milliseconds: 100),
+        () => FocusScope.of(context).requestFocus(titleFocusNode));
   }
 
   void tapBody() {
@@ -41,15 +43,18 @@ class NoteEditModel extends BaseModel {
   }
 
   void doubleTapHtml(BuildContext context) {
-    contentController.selection = contentController.selection.copyWith(affinity: TextAffinity.downstream);
+    contentController.selection =
+        contentController.selection.copyWith(affinity: TextAffinity.downstream);
     editingContent = !editingContent;
     editingTitle = false;
     notifyListeners();
 
-    Future.delayed(const Duration(milliseconds: 100), () => FocusScope.of(context).requestFocus(bodyFocusNode));
+    Future.delayed(const Duration(milliseconds: 100),
+        () => FocusScope.of(context).requestFocus(bodyFocusNode));
   }
 
-  void reset(BuildContext context, TextEditingController titleController, TextEditingController contentController, FetchedNote note) {
+  void reset(BuildContext context, TextEditingController titleController,
+      TextEditingController contentController, FetchedNote note) {
     this.titleController = titleController;
     this.contentController = contentController;
     _note = note;
@@ -85,7 +90,11 @@ class NoteEditModel extends BaseModel {
     if (oldContent != newContent || oldTitle != newTitle) {
       _note.content = newContent;
       _note.title = newTitle;
-      functionsService.editNote(id: _note.id, categoryId: _note.category, title: newTitle, content: newContent);
+      functionsService.editNote(
+          id: _note.id,
+          categoryId: _note.category,
+          title: newTitle,
+          content: newContent);
       return true;
     }
 
@@ -103,12 +112,9 @@ class NoteEditModel extends BaseModel {
   }
 }
 
-enum Format {
-  bold, italics, underline, quote, code, list
-}
+enum Format { bold, italics, underline, quote, code, list }
 
 extension FormatPress on Format {
-
   void press(NoteEditModel model) {
     final content = model.contentController;
     final text = content.text;
@@ -116,16 +122,26 @@ extension FormatPress on Format {
     final multiChar = selection.start != selection.end;
 
     void surroundIn(String surround) {
-      final middle = !multiChar ? '' : text.substring(selection.start, selection.end);
-      content.text = '${text.substring(0, selection.start)}$surround$middle$surround${text.substring(selection.end)}';
-      content.selection = content.selection.copyWith(baseOffset: selection.start + surround.length, extentOffset: selection.end + surround.length);
+      final middle =
+          !multiChar ? '' : text.substring(selection.start, selection.end);
+      content.text =
+          '${text.substring(0, selection.start)}$surround$middle$surround${text.substring(selection.end)}';
+      content.selection = content.selection.copyWith(
+          baseOffset: selection.start + surround.length,
+          extentOffset: selection.end + surround.length);
     }
 
     void prefixWith(String prefix) {
-      final newline = max(-1, text.lastIndexOf(RegExp(r'(\n|^)'), max(0, selection.start - 1))) + 1;
+      final newline = max(
+              -1,
+              text.lastIndexOf(
+                  RegExp(r'(\n|^)'), max(0, selection.start - 1))) +
+          1;
 
-      content.text = '${text.substring(0, newline - 1)}$prefix${text.substring(newline, text.length - 1)}';
-      content.selection = content.selection.copyWith(baseOffset: newline + prefix.length);
+      content.text =
+          '${text.substring(0, newline - 1)}$prefix${text.substring(newline, text.length - 1)}';
+      content.selection =
+          content.selection.copyWith(baseOffset: newline + prefix.length);
     }
 
     void formatBold() => surroundIn('**');
@@ -137,13 +153,19 @@ extension FormatPress on Format {
     void formatQuote() => prefixWith('\n> ');
 
     void formatCode() {
-      final newline = max(-1, text.lastIndexOf(RegExp(r'(\n|^)'), max(0, selection.start - 1))) + 1;
+      final newline = max(
+              -1,
+              text.lastIndexOf(
+                  RegExp(r'(\n|^)'), max(0, selection.start - 1))) +
+          1;
       final end = max(-1, text.indexOf(RegExp(r'(\n|$)'), selection.end));
 
       final hasEnd = end < text.length - 1;
       final afterTick = hasEnd ? text.substring(end, text.length - 1) : '';
-      content.text = '${text.substring(0, newline)}```\n${text.substring(newline, end)}\n```$afterTick';
-      content.selection = content.selection.copyWith(baseOffset: newline, extentOffset: newline);
+      content.text =
+          '${text.substring(0, newline)}```\n${text.substring(newline, end)}\n```$afterTick';
+      content.selection = content.selection
+          .copyWith(baseOffset: newline, extentOffset: newline);
     }
 
     void formatList() => prefixWith('\n- ');

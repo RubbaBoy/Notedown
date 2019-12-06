@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1098756711067",
+    "firebase_url": "https://notedown-e2922.firebaseio.com",
+    "project_id": "notedown-e2922",
+    "storage_bucket": "notedown-e2922.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1098756711067:android:2ed885092cc9f2c3425c3e",
+        "android_client_info": {
+          "package_name": "com.uddernetworks.notedown"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1098756711067-ngf6dbd7ho45naf3jrrs8ctg24ugclsa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uddernetworks.notedown",
+            "certificate_hash": "74af8a9d447527fad7b21c508f99f99a2aae28bf"
+          }
+        },
+        {
+          "client_id": "1098756711067-bbelkovqvveh9k9d34gahqhuathddvj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsXkA5Ii6be6VvKUtCx9Qois1rdqE4FYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1098756711067-bbelkovqvveh9k9d34gahqhuathddvj8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
