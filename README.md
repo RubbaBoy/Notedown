@@ -6,10 +6,4 @@ Here is a short demo video of the app in its current state: https://youtu.be/97l
 
 The following are some screenshots of the current UI, most features are functional (Except searching):
 
-<img src="screenshots/screen1.png" height="680px"/>
-
-<img src="screenshots/screen2.png" height="680px"/>
-
-<img src="screenshots/screen3.png" height="680px"/>
-
-<img src="screenshots/screen4.png" height="680px"/>
+<img src="screenshots/screen1.png" height="680px"/> <img src="screenshots/screen2.png" height="680px"/> <img src="screenshots/screen3.png" height="680px"/> <img src="screenshots/screen4.png" height="680px"/>
