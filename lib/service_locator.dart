@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+
 import 'package:notedown/scoped_model/category_edit_model.dart';
 import 'package:notedown/scoped_model/error_model.dart';
 import 'package:notedown/scoped_model/login_model.dart';

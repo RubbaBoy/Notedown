@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:notedown/scoped_model/login_model.dart';
 import 'package:notedown/ui/views/empty_view.dart';
 

@@ -65,12 +65,9 @@ class FunctionsService {
   Future<String> editNote(
       {String id, String categoryId, String title, String content}) async {
     try {
-      var data = (await _editNoteCallable.call({
-        'id': id,
-        'category': categoryId,
-        'title': title,
-        'content': content
-      }))
+      var data = (await _editNoteCallable.call(
+        {'id': id, 'category': categoryId, 'title': title, 'content': content},
+      ))
           .data;
       if (!data['success']) {
         throw FailedFunctionException('editNote', data['error']);
@@ -104,8 +101,7 @@ class FunctionsService {
   /// Removes the given note.
   Future removeNote(String noteId) async {
     try {
-      var data =
-          (await _removeNoteCallable.call({'note': noteId})).data;
+      var data = (await _removeNoteCallable.call({'note': noteId})).data;
       if (!data['success']) {
         throw FailedFunctionException('removeNote', data['error']);
       }

@@ -3,13 +3,14 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
+
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/services/navigation_service.dart';
 import 'package:notedown/services/request_service.dart';
-import 'package:uuid/uuid.dart';
 
 class CategoryEditModel extends BaseModel {
   final functionsService = locator<FunctionsService>();
@@ -44,7 +45,8 @@ class CategoryEditModel extends BaseModel {
   }
 
   Future<bool> handlePop(BuildContext context) {
-    Navigator.pushAndRemoveUntil(context, NavigationService.getRouteOf(NoteCategory.all), (_) => false);
+    Navigator.pushAndRemoveUntil(
+        context, NavigationService.getRouteOf(NoteCategory.all), (_) => false);
     navigationService.selectedTab = 0;
     return Future.value(false);
   }

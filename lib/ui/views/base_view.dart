@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+
 import 'package:notedown/enums/view_states.dart';
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/scoped_model/note_list_model.dart';
@@ -6,7 +8,6 @@ import 'package:notedown/service_locator.dart';
 import 'package:notedown/ui/views/category_edit_view.dart';
 import 'package:notedown/ui/views/note_list_view.dart';
 import 'package:notedown/ui/widgets/busy_overlay.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class BaseView<T extends BaseModel> extends StatefulWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey;
@@ -59,13 +60,14 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
                     accountName: Text(model.getProfileName()),
                     accountEmail: Text(model.getProfileEmail()),
                     currentAccountPicture: Container(
-                        decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(model.getProfilePicture()),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(model.getProfilePicture()),
+                        ),
                       ),
-                    )),
+                    ),
                   ),
                   ...getCategoryTiles(context),
                   drawerSeparator(),
@@ -76,9 +78,10 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
               ),
             ),
             body: Builder(
-                builder: (context) => SafeArea(
-                      child: widget._builder(context, child, model),
-                    )),
+              builder: (context) => SafeArea(
+                child: widget._builder(context, child, model),
+              ),
+            ),
           ),
         );
 
@@ -101,27 +104,36 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
   @override
   Widget build(BuildContext context) {
     return ScopedModel<T>(
-        model: _model,
-        child: ScopedModelDescendant<T>(
-          child: Container(color: Colors.red),
-          builder: otherBuilder,
-        ));
+      model: _model,
+      child: ScopedModelDescendant<T>(
+        child: Container(color: Colors.red),
+        builder: otherBuilder,
+      ),
+    );
   }
 
   List<ListTile> getCategoryTiles(BuildContext context) => [
         ..._model.navigationService.categories
-                ?.map((category) => drawerItem(
+                ?.map(
+                  (category) => drawerItem(
                     context,
                     category.type == CategoryType.Named
                         ? Icons.label_outline
                         : Icons.home,
                     category.name,
                     id: category.index,
-                    builder: (context) => NoteListView(category)))
+                    builder: (context) => NoteListView(category),
+                  ),
+                )
                 ?.toList() ??
             [],
-        drawerItem(context, Icons.edit, 'Manage Categories',
-            id: -1, builder: (context) => CategoryEditView()),
+        drawerItem(
+          context,
+          Icons.edit,
+          'Manage Categories',
+          id: -1,
+          builder: (context) => CategoryEditView(),
+        ),
       ];
 
   Divider drawerSeparator() => Divider();
@@ -141,19 +153,20 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>> {
       Function() onTap,
       WidgetBuilder builder}) {
     return ListTile(
-        leading: Icon(icon),
-        title: Text(name),
-        selected: _model.navigationService.selectedTab == id,
-        onTap: () {
-          Navigator.pop(context);
-          if (onTap != null) {
-            onTap();
-          } else if (builder != null) {
-            Navigator.push(context, MaterialPageRoute(builder: builder));
-            if (id >= 0) {
-              _model.navigationService.selectedTab = id;
-            }
+      leading: Icon(icon),
+      title: Text(name),
+      selected: _model.navigationService.selectedTab == id,
+      onTap: () {
+        Navigator.pop(context);
+        if (onTap != null) {
+          onTap();
+        } else if (builder != null) {
+          Navigator.push(context, MaterialPageRoute(builder: builder));
+          if (id >= 0) {
+            _model.navigationService.selectedTab = id;
           }
-        });
+        }
+      },
+    );
   }
 }

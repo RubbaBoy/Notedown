@@ -3,10 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
+
 import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/ui/views/base_view.dart';
-import 'package:outline_material_icons/outline_material_icons.dart';
 
 class NoteListView extends StatefulWidget {
   final NoteCategory category;
@@ -42,42 +43,42 @@ class NoteListViewState extends State<NoteListView> {
       },
       onModelReady: (model) => model.refreshNotes(context, category),
       builder: (context, child, model) => ListView(
-          shrinkWrap: true,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-              child: Card(
-                color: Theme.of(context).cardColor,
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.menu),
-                      onPressed: () => _scaffoldKey.currentState.openDrawer(),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search notes',
-                            border: InputBorder.none,
-                          ),
+        shrinkWrap: true,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+            child: Card(
+              color: Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.menu),
+                    onPressed: () => _scaffoldKey.currentState.openDrawer(),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search notes',
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(OMIcons.viewAgenda),
-                      onPressed: () {
-                        print('Changed view type!');
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                  IconButton(
+                    icon: Icon(OMIcons.viewAgenda),
+                    onPressed: () {
+                      print('Changed view type!');
+                    },
+                  ),
+                ],
               ),
             ),
-            NoteWrap(noteCategory: category),
-          ],
-        ),
+          ),
+          NoteWrap(noteCategory: category),
+        ],
+      ),
     );
   }
 }

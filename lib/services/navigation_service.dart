@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
@@ -36,12 +37,12 @@ class NavigationService {
   int nextIndex() => index++;
 
   static void toCategory(BuildContext context, NoteCategory category) {
-    Navigator.push(
-        context,
-        NavigationService.getRouteOf(category));
+    Navigator.push(context, NavigationService.getRouteOf(category));
   }
 
-  static MaterialPageRoute getRouteOf(NoteCategory category) => MaterialPageRoute(
-      builder: (context) => NoteListView(category),
-      settings: RouteSettings(name: category.uuid));
+  static MaterialPageRoute getRouteOf(NoteCategory category) =>
+      MaterialPageRoute(
+        builder: (context) => NoteListView(category),
+        settings: RouteSettings(name: category.uuid),
+      );
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:markdown/markdown.dart' as md;
+
 import 'package:notedown/scoped_model/note_edit_model.dart';
 import 'package:notedown/services/functions_service.dart';
 import 'package:notedown/ui/views/base_view.dart';

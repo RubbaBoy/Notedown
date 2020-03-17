@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
+
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';

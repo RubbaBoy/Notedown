@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:notedown/scoped_model/note_list_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
@@ -20,11 +21,15 @@ class AuthService {
   FirebaseUser getUser() => user;
 
   Future<FirebaseUser> trySilent() async {
-    return _googleSignIn.signInSilently().then((account) => firebaseFromGoogle(account));
+    return _googleSignIn
+        .signInSilently()
+        .then((account) => firebaseFromGoogle(account));
   }
 
   Future<FirebaseUser> signIn() async {
-    return _googleSignIn.signIn().then((account) => firebaseFromGoogle(account));
+    return _googleSignIn
+        .signIn()
+        .then((account) => firebaseFromGoogle(account));
   }
 
   Future<FirebaseUser> firebaseFromGoogle(GoogleSignInAccount account) async {
@@ -36,14 +41,19 @@ class AuthService {
       idToken: googleAuth.idToken,
     );
 
-    return user = (await FirebaseAuth.instance.signInWithCredential(credential)).user;
+    return user =
+        (await FirebaseAuth.instance.signInWithCredential(credential)).user;
   }
 
   void goToNotes(BuildContext context) {
-    navigationService.getCachedCategories().then((_) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => NoteListView(NoteCategory.all)));
-    });
+    navigationService.getCachedCategories().then(
+      (_) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NoteListView(NoteCategory.all)));
+      },
+    );
   }
 
   void checkAuthentication(BuildContext context) {
@@ -56,15 +66,19 @@ class AuthService {
 
   void handleAuthed(BuildContext context, Future<FirebaseUser> user) {
     if (user == null) return;
-    user.then((user) {
-      if (user == null) return;
-      print('${user.displayName} logged in');
-      goToNotes(context);
-      Fluttertoast.showToast(msg: 'Welcome ${user.displayName}!');
-    }).catchError((e, s) {
-      print('Exception details:\n $e');
-      print('Stack trace:\n $s');
-      Fluttertoast.showToast(msg: 'An error occurred while authenticating!');
-    });
+    user.then(
+      (user) {
+        if (user == null) return;
+        print('${user.displayName} logged in');
+        goToNotes(context);
+        Fluttertoast.showToast(msg: 'Welcome ${user.displayName}!');
+      },
+    ).catchError(
+      (e, s) {
+        print('Exception details:\n $e');
+        print('Stack trace:\n $s');
+        Fluttertoast.showToast(msg: 'An error occurred while authenticating!');
+      },
+    );
   }
 }

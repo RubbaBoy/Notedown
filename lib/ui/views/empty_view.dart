@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:notedown/enums/view_states.dart';
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/service_locator.dart';
@@ -10,9 +11,10 @@ class EmptyView<T extends BaseModel> extends StatefulWidget {
   final ScopedModelDescendantBuilder<T> _builder;
   final Function(T) onModelReady;
 
-  EmptyView({GlobalKey<ScaffoldState> scaffoldKey,
-    ScopedModelDescendantBuilder<T> builder,
-    this.onModelReady})
+  EmptyView(
+      {GlobalKey<ScaffoldState> scaffoldKey,
+      ScopedModelDescendantBuilder<T> builder,
+      this.onModelReady})
       : _scaffoldKey = scaffoldKey,
         _builder = builder;
 
@@ -27,14 +29,14 @@ class _EmptyViewState<T extends BaseModel> extends State<EmptyView<T>> {
   @override
   void initState() {
     otherBuilder = (context, child, model) => BusyOverlay(
-        show: model.state == ViewState.Busy,
-        child: Scaffold(
-          key: widget._scaffoldKey,
-          body: SafeArea(
-            child: widget._builder(context, child, model),
+          show: model.state == ViewState.Busy,
+          child: Scaffold(
+            key: widget._scaffoldKey,
+            body: SafeArea(
+              child: widget._builder(context, child, model),
+            ),
           ),
-        ),
-    );
+        );
 
     if (widget.onModelReady != null) {
       widget.onModelReady(_model);
@@ -46,10 +48,11 @@ class _EmptyViewState<T extends BaseModel> extends State<EmptyView<T>> {
   @override
   Widget build(BuildContext context) {
     return ScopedModel<T>(
-        model: _model,
-        child: ScopedModelDescendant<T>(
-          child: Container(color: Colors.red),
-          builder: otherBuilder,
-        ));
+      model: _model,
+      child: ScopedModelDescendant<T>(
+        child: Container(color: Colors.red),
+        builder: otherBuilder,
+      ),
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:notedown/scoped_model/base_model.dart';
 import 'package:notedown/service_locator.dart';
 import 'package:notedown/services/functions_service.dart';
@@ -22,7 +23,11 @@ class NoteListModel extends BaseModel {
     if (category.removed) {
       print('Note has been removed!');
       Navigator.pop(context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => NoteListView(NoteCategory.all), settings: RouteSettings(name: category.uuid)));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => NoteListView(NoteCategory.all),
+              settings: RouteSettings(name: category.uuid)));
       return;
     }
 
@@ -40,7 +45,8 @@ class NoteListModel extends BaseModel {
         context,
         MaterialPageRoute(
             builder: (context) => NoteEditView(
-                note: note ?? FetchedNote('', categoryId, '', ''), save: save)));
+                note: note ?? FetchedNote('', categoryId, '', ''),
+                save: save)));
   }
 
   void addNote(NoteCategory category, FetchedNote note) {

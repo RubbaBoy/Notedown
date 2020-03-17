@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:notedown/scoped_model/category_edit_model.dart';
 import 'package:notedown/ui/views/base_view.dart';
 
@@ -16,14 +17,16 @@ class CategoryEditViewState extends State<CategoryEditView> {
   @override
   Widget build(BuildContext context) {
     textStyle = Theme.of(context).textTheme.body1.copyWith(fontSize: 18);
-    hintStyle =
-        textStyle.copyWith(fontSize: 18, color: textStyle.color.withAlpha(127));
+    hintStyle = textStyle.copyWith(
+      fontSize: 18,
+      color: textStyle.color.withAlpha(127),
+    );
     return BaseView<CategoryEditModel>(
-        showFab: false,
-        onModelReady: (model) {},
-        builder: (context, child, model) => WillPopScope(
-          onWillPop: () => model.handlePop(context),
-          child: Column(
+      showFab: false,
+      onModelReady: (model) {},
+      builder: (context, child, model) => WillPopScope(
+        onWillPop: () => model.handlePop(context),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
@@ -44,47 +47,49 @@ class CategoryEditViewState extends State<CategoryEditView> {
             Divider(height: 8),
             Expanded(
               child: SingleChildScrollView(
-                child: Column(children: [
-                  Row(
-                    children: [
-                      if (!model.topFocus)
-                        getLeftAction(
-                          icon: Icons.add,
-                          onPressed: () => model.startCreating(context),
-                        ),
-                      if (model.topFocus)
-                        getLeftAction(
-                          icon: Icons.clear,
-                          onPressed: () => model.endCreating(),
-                        ),
-                      Expanded(
-                        child: TextField(
-                          autofocus: false,
-                          focusNode: model.topFocusNode,
-                          controller: model.topController,
-                          onSubmitted: (_) => model.createCategory(),
-                          onEditingComplete: () => model.createCategory(),
-                          textAlign: TextAlign.left,
-                          style: textStyle,
-                          decoration: InputDecoration(
-                            hintStyle: hintStyle,
-                            hintText: 'Create new category',
-                            border: InputBorder.none,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        if (!model.topFocus)
+                          getLeftAction(
+                            icon: Icons.add,
+                            onPressed: () => model.startCreating(context),
+                          ),
+                        if (model.topFocus)
+                          getLeftAction(
+                            icon: Icons.clear,
+                            onPressed: () => model.endCreating(),
+                          ),
+                        Expanded(
+                          child: TextField(
+                            autofocus: false,
+                            focusNode: model.topFocusNode,
+                            controller: model.topController,
+                            onSubmitted: (_) => model.createCategory(),
+                            onEditingComplete: () => model.createCategory(),
+                            textAlign: TextAlign.left,
+                            style: textStyle,
+                            decoration: InputDecoration(
+                              hintStyle: hintStyle,
+                              hintText: 'Create new category',
+                              border: InputBorder.none,
+                            ),
                           ),
                         ),
-                      ),
-                      if (model.topFocus)
-                        getButton(
-                          icon: Icons.check,
-                          color: Colors.blue,
-                          padding: EdgeInsets.fromLTRB(32, 16, 16, 16),
-                          onPressed: () => model.createCategory(),
-                        ),
-                    ],
-                  ),
-                  getDivider(context, model.showTopDivider()),
-                  ...getCategoryDisplays(context, model),
-                ]),
+                        if (model.topFocus)
+                          getButton(
+                            icon: Icons.check,
+                            color: Colors.blue,
+                            padding: EdgeInsets.fromLTRB(32, 16, 16, 16),
+                            onPressed: () => model.createCategory(),
+                          ),
+                      ],
+                    ),
+                    getDivider(context, model.showTopDivider()),
+                    ...getCategoryDisplays(context, model),
+                  ],
+                ),
               ),
             ),
           ],
@@ -125,11 +130,13 @@ class CategoryEditViewState extends State<CategoryEditView> {
                       if (model.hasFocus(category))
                         getLeftAction(
                           icon: Icons.delete,
-                          onPressed: () => confirmDelete().then((delete) {
-                            if (delete) {
-                              model.onDelete(context, category);
-                            }
-                          }),
+                          onPressed: () => confirmDelete().then(
+                            (delete) {
+                              if (delete) {
+                                model.onDelete(context, category);
+                              }
+                            },
+                          ),
                         ),
                       Expanded(
                         child: TextField(
@@ -227,15 +234,21 @@ class CategoryEditViewState extends State<CategoryEditView> {
     }
 
     return SizedBox(
-        width: size + hTotal,
-        height: size + vTotal,
-        child: IconButton(
-          splashColor: ThemeData.dark().splashColor,
-          icon: Icon(icon, size: size, color: color),
-          onPressed: onPressed,
-          padding: padding ??
-              EdgeInsets.fromLTRB(hpadding, vpadding, hpadding, vpadding),
-          alignment: AlignmentDirectional.center,
-        ));
+      width: size + hTotal,
+      height: size + vTotal,
+      child: IconButton(
+        splashColor: ThemeData.dark().splashColor,
+        icon: Icon(icon, size: size, color: color),
+        onPressed: onPressed,
+        padding: padding ??
+            EdgeInsets.fromLTRB(
+              hpadding,
+              vpadding,
+              hpadding,
+              vpadding,
+            ),
+        alignment: AlignmentDirectional.center,
+      ),
+    );
   }
 }
